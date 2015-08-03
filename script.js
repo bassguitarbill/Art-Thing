@@ -1,3 +1,20 @@
+function Easer(eLength) {
+	
+	var eLength = eLength || 10;
+	var eArray = [];
+	
+	function average(array) {
+		return (array.reduce(function(a, b){return a+b}) / array.length);
+	}
+	
+	this.ease = function(v) {
+		eArray.unshift(v);
+		if(eArray.length > eLength)
+			eArray = eArray.slice(0, eLength);
+		return average(eArray);
+	}
+}
+
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
 
 addEventListener('load', engage);
@@ -5,10 +22,14 @@ addEventListener('load', engage);
 var audioArray;
 var analyzer;
 var context;
+var easer;
 
 function engage() {
+
 	var canvas = document.querySelector('canvas');
 	context = canvas.getContext('2d');
+	
+	easer = new Easer();
 	
 	canvas.addEventListener('click', function() {
 		if(canvas.webkitRequestFullScreen)
@@ -20,16 +41,16 @@ function engage() {
 }
 
 function weGotOurselvesAMicrophone(stream) {
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    var audioContext = new AudioContext();
+	window.AudioContext = window.AudioContext || window.webkitAudioContext;
+	var audioContext = new AudioContext();
 
-    var mediaStreamSource = audioContext.createMediaStreamSource( stream );
+	var mediaStreamSource = audioContext.createMediaStreamSource( stream );
 	
 	analyzer = audioContext.createAnalyser();
 	//analyzer.fftSize = 32;
 	audioArray = new Float32Array(analyzer.frequencyBinCount);
 
-    mediaStreamSource.connect( analyzer );
+	mediaStreamSource.connect( analyzer );
 	
 	window.a = analyzer;
 	
@@ -49,7 +70,7 @@ function drawStuff(hrTimeStamp) {
 	context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 	context.fillStyle = "#FAA2FA";
 	context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-	context.globalAlpha = max;
+	context.globalAlpha = easer.ease(max);
 	context.fillStyle = "#F00";
 	context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 	context.globalAlpha = 1;
