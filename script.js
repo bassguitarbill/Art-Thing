@@ -39,17 +39,18 @@ function weGotOurselvesAMicrophone(stream) {
 function drawStuff(hrTimeStamp) {
 	analyzer.getFloatTimeDomainData(audioArray);
 	
-	var max = 0;
+	var sum = 0;
 	for(var i = 0; i < audioArray.length; i++)
-		max = Math.max(max, Math.abs(audioArray[i]));
+		sum += Math.pow(audioArray[i], 2);
+	var rms = Math.sqrt(sum / audioArray.length);
 		
-	var hue = 360 * max;
+	var hue = 360 * rms;
 	var color = "hsl("+hue+",100%, 50%)";
 	context.fillStyle = color;
 	context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 	context.fillStyle = "#FAA2FA";
 	context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-	context.globalAlpha = max;
+	context.globalAlpha = rms;
 	context.fillStyle = "#F00";
 	context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 	context.globalAlpha = 1;
